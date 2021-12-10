@@ -402,7 +402,10 @@ runLauncher:
       #
       # envSecrets:
       #   - name: secret
-      envSecrets: []
+      envSecrets:
+          - name: dagster-aws-access-key-id
+          - name: dagster-aws-secret-access-key
+
 
       # Additional variables from the existing environment can be passed into the Job.
       #

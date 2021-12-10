@@ -1,5 +1,7 @@
 KIND_INSTANCE=k8s-dagster-playground
 
+DAGSTER_VERSION=0.13.11
+
 # creates a K8s instance
 .PHONY: k8s_new
 k8s_new:
@@ -27,4 +29,5 @@ install_infra: k8s_connect
 	# create a dagster-data bucket to use for storing our data
 	helm install --namespace minio --create-namespace --set buckets[0].name=dagster-data,buckets[0].policy=none,buckets[0].purge=false --set replicas=4 --set resources.requests.memory=120m --set rootUser=rootuser,rootPassword=rootpass123 minio minio/minio
 	# install dagster
-	helm install --namespace dagster --create-namespace dagster dagster/dagster
+	# uses a values.yaml as the configuration is complicated ;-(
+	helm install --namespace dagster --create-namespace --values ./helm/dagster/values.yaml --version $(DAGSTER_VERSION) dagster dagster/dagster

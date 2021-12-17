@@ -51,7 +51,7 @@ dagit:
   workspace:
     enabled: false
     servers:
-      - host: "k8s-example-user-code-1"
+      - host: "project-example"
         port: 3030
 
   # Deploy a separate instance of Dagit in --read-only mode (can't launch runs, disable schedules, etc.)
@@ -216,59 +216,18 @@ dagster-user-deployments:
 
   # List of unique deployments
   deployments:
-    - name: "k8s-example-user-code-1"
+    - name: "project-example"
       image:
-        # When a tag is not supplied, it will default as the Helm chart version.
-        repository: "docker.io/dagster/user-code-example"
-        tag: 0.13.11
-
-        # Change with caution! If you're using a fixed tag for pipeline run images, changing the
-        # image pull policy to anything other than "Always" will use a cached/stale image, which is
-        # almost certainly not what you want.
-        pullPolicy: Always
-
-      # Arguments to `dagster api grpc`.
-      # Ex: "dagster api grpc -m dagster_test.test_project.test_pipelines.repo -a define_demo_execution_repo"
-      # would translate to:
-      # dagsterApiGrpcArgs:
-      #   - "-m"
-      #   - "dagster_test.test_project.test_pipelines.repo"
-      #   - "-a"
-      #   - "define_demo_execution_repo"
+        repository: "project-example"
+        tag: latest
+        pullPolicy: IfNotPresent
       dagsterApiGrpcArgs:
-        - "--python-file"
-        - "/example_project/example_repo/repo.py"
+         - "--python-file"
+         - "/project-example/repo.py"
       port: 3030
-
-      # Additional environment variables to set.
-      # A Kubernetes ConfigMap will be created with these environment variables. See:
-      # https://kubernetes.io/docs/concepts/configuration/configmap/
-      #
-      # Example:
-      #
-      # env:
-      #   ENV_ONE: one
-      #   ENV_TWO: two
       env: {}
-
-      # Additional environment variables can be retrieved and set from ConfigMaps. See:
-      # https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#configure-all-key-value-pairs-in-a-configmap-as-container-environment-variables
-      #
-      # Example:
-      #
-      # envConfigMaps:
-      #   - name: config-map
       envConfigMaps: []
-
-      # Additional environment variables can be retrieved and set from Secrets. See:
-      # https://kubernetes.io/docs/concepts/configuration/secret/#use-case-as-container-environment-variables
-      #
-      # Example:
-      #
-      # envSecrets:
-      #   - name: secret
       envSecrets: []
-
       annotations: {}
       nodeSelector: {}
       affinity: {}
@@ -277,28 +236,15 @@ dagster-user-deployments:
       securityContext: {}
       resources: {}
       replicaCount: 1
-      # Liveness Probe and Startup Probe are optional. For more configuration docs, see:
-      # https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes
-      # Note that Startup Probe is only available as a kubernetes v1.16+ feature.
       livenessProbe:
-        # If `livenessProbe` has no `exec` field, then the following default will be used:
-        # exec:
-        #   command: ["dagster", "api", "grpc-health-check", "-p", "{{ $deployment.port }}"]
         initialDelaySeconds: 0
         periodSeconds: 20
         timeoutSeconds: 3
         successThreshold: 1
         failureThreshold: 3
 
-      # Startup probe (available in kubernetes v1.16+) is used at pod startup. Once it has succeeded,
-      # then liveness probe takes over.
-      # If on kubernetes < v1.16, then disable `startupProbe` and comment in
-      # `initialDelaySeconds: 60` under `livenessProbe`
       startupProbe:
         enabled: true
-        # If `startupProbe` has no `exec` field, then the following default will be used:
-        # exec:
-        #   command: ["dagster", "api", "grpc-health-check", "-p", "{{ $deployment.port }}"]
         initialDelaySeconds: 0
         periodSeconds: 10
         timeoutSeconds: 3
@@ -367,7 +313,7 @@ runLauncher:
       # Change with caution! If you're using a fixed tag for pipeline run images, changing the
       # image pull policy to anything other than "Always" will use a cached/stale image, which is
       # almost certainly not what you want.
-      imagePullPolicy: "Always"
+      imagePullPolicy: IfNotPresent
 
       ## The image to use for the launched Job's Dagster container.
       ## The `pullPolicy` field is ignored. Use`imagePullPolicy` instead.

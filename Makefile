@@ -34,3 +34,8 @@ install_infra: k8s_connect
 	# add in the S3 secrets so that dagster run instances can get to S3
 	kubectl create secret generic -n=dagster dagster-aws-access-key-id --from-literal=AWS_ACCESS_KEY_ID=rootuser
 	kubectl create secret generic -n=dagster dagster-aws-secret-access-key --from-literal=AWS_SECRET_ACCESS_KEY=rootpass123
+
+# loads the docker containers into the kind environments
+.PHONY: k8s_side_load
+k8s_side_load:
+	kind load docker-image project-example --name $(KIND_INSTANCE)

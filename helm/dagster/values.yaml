@@ -225,9 +225,12 @@ dagster-user-deployments:
          - "--python-file"
          - "/project-example/repo.py"
       port: 3030
-      env: {}
+      env: 
+        AWS_ENDPOINT_URL : "http://minio.minio.svc.cluster.local:9000"
       envConfigMaps: []
-      envSecrets: []
+      envSecrets:
+          - name: dagster-aws-access-key-id
+          - name: dagster-aws-secret-access-key
       annotations: {}
       nodeSelector: {}
       affinity: {}
@@ -849,7 +852,9 @@ dagsterDaemon:
   #
   # envSecrets:
   #   - name: secret
-  envSecrets: []
+  envSecrets: 
+    - name: dagster-aws-access-key-id
+    - name: dagster-aws-secret-access-key
 
   annotations: {}
   nodeSelector: {}
